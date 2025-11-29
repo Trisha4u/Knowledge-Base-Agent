@@ -50,3 +50,87 @@ This ensures **no hallucination**, **no external API dependency**, and **accurat
 
 ## 📂 Project Structure
 
+knowledge-base-agent/
+│
+├── app.py # Main Streamlit chatbot UI
+├── ingest.py # Converts PDF → chunks → embeddings → ChromaDB
+├── requirements.txt # Dependencies
+│
+├── docs/
+│ └── Company Knowledge Base.pdf # Company knowledge source
+│
+├── chroma_db/ # Vector database (auto-created by ingest.py)
+│
+└── README.md
+
+---
+
+## 📄 Features
+
+### ✅ 1. Ask questions in natural language  
+User can type:  
+- “How many sick leaves do employees get?”  
+- “What are working hours?”  
+- “What is the WFH policy?”  
+
+### ✅ 2. Answers strictly from PDF  
+No hallucinations.  
+Only information present in the document is shown.
+
+### ✅ 3. Short, clean 2–3 line answers  
+Readable, chatbot-style responses.
+
+### ✅ 4. Handles unknown questions  
+If asked something outside the PDF (e.g., “Who is Virat Kohli?”), it replies with:  
+
+> “I couldn’t find anything about that in the document. Try asking about leaves, working hours, WFH, roles, onboarding, or support.”
+
+### ✅ 5. Greeting support  
+Typing “hi”, “hello”, etc. gives a friendly chatbot introduction.
+
+---
+
+## 🏗️ Architecture Diagram
+               ┌────────────────────────┐
+               │      PDF Document       │
+               │  (Company KB Document)  │
+               └───────────┬────────────┘
+                           │
+                      ingest.py
+                           │
+   ┌─────────────Chunks + Embeddings─────────────┐
+                           │
+                    ┌──────▼──────┐
+                    │  ChromaDB   │  ← Vector Database
+                    │ (company_kb)│
+                    └──────┬──────┘
+                           │
+                     app.py (UI)
+                           │
+            ┌────────Query + Embedding────────┐
+                           │
+                    SentenceTransformer
+                           │
+                 Top-K similar chunks
+                           │
+                   Answer extraction
+                           │
+                  Final 2–3 line answer
+                           │
+                       User UI
+
+2. Activate it
+
+Windows:
+
+.venv\Scripts\activate
+
+3. Install dependencies
+pip install -r requirements.txt
+
+4. Ingest the PDF into ChromaDB
+python ingest.py
+
+5. Run the chatbot
+streamlit run app.py
+
